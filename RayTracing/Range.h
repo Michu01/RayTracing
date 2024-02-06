@@ -2,21 +2,12 @@
 
 #include <limits>
 
-class Range
+struct Range
 {
-private:
-	double min{};
-	double max{};
+	float min{};
+	float max{};
 
-public:
-	static const Range NonNegative;
+	Range(float min, float max);
 
-public:
-	Range(double min, double max);
-
-	double GetMin() const;
-
-	double GetMax() const;
-
-	bool Contains(double value) const;
+	bool Contains(float value) const;
 };

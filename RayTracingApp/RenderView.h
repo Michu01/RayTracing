@@ -8,7 +8,6 @@
 #include <mutex>
 
 #include "Renderer.h"
-#include "Conversions.h"
 #include "Sphere.h"
 #include "Renderer.h"
 #include "DefaultSettings.h"

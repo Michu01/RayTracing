@@ -1,73 +1,73 @@
 #include "Camera.h"
 
-Camera::Camera(double vFov, double aspectRatio, Point3d lookFrom, Point3d lookAt) :
+Camera::Camera(float vFov, float aspectRatio, const glm::vec3& lookFrom, const glm::vec3& lookAt) :
 	vFov{ vFov }, lookFrom{ lookFrom }, lookAt{ lookAt }, aspectRatio{ aspectRatio }
 {
 }
 
 Camera::Camera() :
-	vFov{}, aspectRatio{}
+	vFov{}, aspectRatio{}, lookFrom{}, lookAt{}
 {
 }
 
-Ray Camera::CreateRay(SizeU size, size_t row, size_t column) const
+Ray Camera::CreateRay(glm::uvec2 size, size_t row, size_t column) const
 {
-	Vector3d direction = lookFrom - lookAt;
+	glm::vec3 direction = lookFrom - lookAt;
 
-	Vector3d w = direction.Normalize();
-	Vector3d u = CrossProduct(up, w).Normalize();
-	Vector3d v = CrossProduct(w, u);
+	glm::vec3 w = glm::normalize(direction);
+	glm::vec3 u = glm::normalize(glm::cross(up, w));;
+	glm::vec3 v = glm::cross(w, u);
 
-	double focalLength = direction.GetLength();
+	float focalLength = glm::length(direction);
 
-	double theta = DegreesToRadians(vFov);
-	double viewportHeight = 2 * tan(0.5 * theta) * focalLength;
-	double viewportWidth = viewportHeight * aspectRatio;
+	float theta = glm::radians(vFov);
+	float viewportHeight = 2.0f * tan(0.5f * theta) * focalLength;
+	float viewportWidth = viewportHeight * aspectRatio;
 
-	Vector3d viewportU = viewportWidth * u;
-	Vector3d viewportV = viewportHeight * -v;
+	glm::vec3 viewportU = viewportWidth * u;
+	glm::vec3 viewportV = viewportHeight * -v;
 
-	Vector3d pixelDeltaU = viewportU / (double)size.width;
-	Vector3d pixelDeltaV = viewportV / (double)size.height;
+	glm::vec3 pixelDeltaU = viewportU / (float)size.x;
+	glm::vec3 pixelDeltaV = viewportV / (float)size.y;
 
-	Vector3d viewportUpperLeft = lookFrom - focalLength * w - 0.5 * (viewportU + viewportV);
+	glm::vec3 viewportUpperLeft = lookFrom - focalLength * w - 0.5f * (viewportU + viewportV);
 
-	Vector3d pixelStart = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
+	glm::vec3 pixelStart = viewportUpperLeft + 0.5f * (pixelDeltaU + pixelDeltaV);
 
-	std::uniform_real_distribution<double> distribution(-0.5, 0.5);
+	std::uniform_real_distribution<float> distribution(-0.5f, 0.5f);
 
-	double dx = Random::Instance.RandomDouble(distribution);
-	double dy = Random::Instance.RandomDouble(distribution);
+	float dx = Random::Instance.Float(distribution);
+	float dy = Random::Instance.Float(distribution);
 
-	Vector3d pixelCoord = pixelStart + ((double)row * pixelDeltaV) + ((double)column * pixelDeltaU);
-	Vector3d sampleCoord = pixelCoord + dx * pixelDeltaU + dy * pixelDeltaV;
+	glm::vec3 pixelCoord = pixelStart + ((float)row * pixelDeltaV) + ((float)column * pixelDeltaU);
+	glm::vec3 sampleCoord = pixelCoord + dx * pixelDeltaU + dy * pixelDeltaV;
 
 	Ray ray(lookFrom, sampleCoord - lookFrom);
 
 	return ray;
 }
 
-void Camera::SetUp(const Vector3d& up)
+void Camera::SetUp(const glm::vec3& up)
 {
 	this->up = up;
 }
 
-void Camera::SetLookFrom(const Point3d& lookFrom)
+void Camera::SetLookFrom(const glm::vec3& lookFrom)
 {
 	this->lookFrom = lookFrom;
 }
 
-void Camera::SetLookAt(const Point3d& lookAt)
+void Camera::SetLookAt(const glm::vec3& lookAt)
 {
 	this->lookAt = lookAt;
 }
 
-void Camera::SetVFov(double vFov)
+void Camera::SetVFov(float vFov)
 {
 	this->vFov = vFov;
 }
 
-void Camera::SetAspectRatio(double aspectRatio)
+void Camera::SetAspectRatio(float aspectRatio)
 {
 	this->aspectRatio = aspectRatio;
 }

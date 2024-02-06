@@ -10,7 +10,7 @@ SettingsProvider::SettingsProvider()
 	LookFromZ = Property<double>(DefaultSettings::LookFrom.z, [this](double value) { EmitEvent(value, Settings::LookFromZ); });
 }
 
-Point3d SettingsProvider::GetLookFrom() const
+glm::vec3 SettingsProvider::GetLookFrom() const
 {
-	return Point3d(LookFromX.Get(), LookFromY.Get(), LookFromZ.Get());
+	return glm::vec3(LookFromX.Get(), LookFromY.Get(), LookFromZ.Get());
 }

@@ -1,22 +1,22 @@
 #include "LambertianMaterial.h"
 #include "HitResult.h"
 
-LambertianMaterial::LambertianMaterial(Color color, double reflectance) :
+LambertianMaterial::LambertianMaterial(const glm::vec3& color, float reflectance) :
     color{ color }, reflectance{ reflectance }
 {
 }
 
-std::optional<std::pair<Color, Ray>> LambertianMaterial::Scatter(const Ray&, const HitResult& hitResult) const
+std::optional<std::pair<glm::vec3, Ray>> LambertianMaterial::Scatter(const Ray&, const HitResult& hitResult) const
 {
-    Vector3d direction = hitResult.normal + Random::Instance.RandomUnitVector3d();
+    glm::vec3 direction = hitResult.normal + Random::Instance.UnitVec3();
 
-    if (direction.GetLengthSquared() < 1e-8)
+    if (glm::length(direction) < 1e-8)
     {
         return {};
     }
 
     Ray outputRay(hitResult.p, direction);
-    Color outputColor = reflectance * color;
+    glm::vec3 outputColor = reflectance * color;
 
     return std::pair{ outputColor, outputRay };
 }

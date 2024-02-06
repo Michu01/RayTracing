@@ -17,11 +17,11 @@ void SphereCollection::Add(Sphere&& sphere)
 std::optional<HitResult> SphereCollection::Hit(const Ray& ray, Range range) const
 {
     std::optional<HitResult> result;
-    double tClosest = range.GetMax();
+    float tClosest = range.max;
 
     for (const Sphere& sphere : spheres)
     {
-        auto temp = sphere.Hit(ray, Range(range.GetMin(), tClosest));
+        auto temp = sphere.Hit(ray, Range(range.min, tClosest));
 
         if (temp)
         {

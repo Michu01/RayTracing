@@ -8,7 +8,6 @@
 #include <functional>
 
 #include "Image.h"
-#include "Vector3.h"
 #include "Camera.h"
 #include "Ray.h"
 #include "SleepFor.h"
@@ -22,9 +21,9 @@ private:
 	std::chrono::seconds logDelay;
 
 private:
-	void LogProgress(std::atomic_uint& i, const SizeU& imageSize, std::stop_token stopToken) const;
+	void LogProgress(std::atomic_uint& i, glm::uvec2 imageSize, std::stop_token stopToken) const;
 
-	Color GetRayColor(const Ray& ray, const SphereCollection& sphereCollection, size_t bounces = 0) const;
+	glm::vec3 GetRayColor(const Ray& ray, const SphereCollection& sphereCollection, size_t bounces = 0) const;
 
 public:
 	Renderer();
@@ -35,10 +34,10 @@ public:
 
 	size_t GetSamplesPerPixel() const;
 
-	Image Render(const SizeU& imageSize, const Camera& camera, const SphereCollection& sphereCollection) const;
+	Image Render(glm::uvec2 imageSize, const Camera& camera, const SphereCollection& sphereCollection) const;
 
 	void Render(Image& image, const Camera& camera, const SphereCollection& sphereCollection) const;
 
-	std::function<void(Image&)> GetRenderFunction(const SizeU& imageSize, const Camera& camera, const SphereCollection& sphereCollection) const;
+	std::function<void(Image&)> GetRenderFunction(glm::uvec2 imageSize, const Camera& camera, const SphereCollection& sphereCollection) const;
 };
 

@@ -2,30 +2,23 @@
 
 Random Random::Instance;
 
-double Random::RandomDouble(std::uniform_real_distribution<double> distribution)
+float Random::Float(std::uniform_real_distribution<float> distribution)
 {
     return distribution(generator);
 }
 
-Vector3d Random::RandomUnitVector3d()
+glm::vec3 Random::UnitVec3()
 {
-    double theta = RandomDouble(std::uniform_real_distribution(0.0, std::numbers::pi));
-    double phi = RandomDouble(std::uniform_real_distribution(0.0, 2.0 * std::numbers::pi));
-    Vector3d vec;
+    float theta = Float(std::uniform_real_distribution(0.0f, std::numbers::pi_v<float>));
+    float phi = Float(std::uniform_real_distribution(0.0f, 2.0f * std::numbers::pi_v<float>));
+    glm::vec3 vec{};
     vec.x = sin(theta) * cos(phi);
     vec.y = sin(theta) * sin(phi);
     vec.z = cos(theta);
     return vec;
 }
 
-Vector3d Random::RandomUnitVector3dInHemisphere(const Vector3d& normal)
-{
-    Vector3d vec = RandomUnitVector3d();
-
-    return DotProduct(vec, normal) > 0.0 ? vec : -vec;
-}
-
-Color Random::RandomColor()
+glm::vec3 Random::Color()
 {
     std::uniform_real_distribution distribution(0.0, 1.0);
 

@@ -15,13 +15,13 @@ RenderView::RenderView(wxWindow* parent, wxWindowID id, const wxPoint& position,
 	renderer = Renderer(SettingsProvider::Instance.SamplesPerPixel.Get(), bounceLimit, std::chrono::duration<long long>::max());
 	collection = SphereCollection
 	{
-		Sphere(Point3d(0, 0, 1), 0.5, LambertianMaterial(Color(0.7, 0.5, 0.8), 0.5)),
-		Sphere(Point3d(1.5, 0, 1), 0.5, MetalMaterial(Color(0.42, 0.76, 0.23), 0.2)),
-		Sphere(Point3d(-1.5, 0, 1), 0.5, DielectricMaterial(1.0)),
-		Sphere(Point3d(0, -1000.5, 1), 1000, LambertianMaterial(Color(0.3, 0.6, 0.45), 0.6))
+		Sphere(glm::vec3(0, 0, 1), 0.5, LambertianMaterial(glm::vec3(0.7, 0.5, 0.8), 0.5)),
+		Sphere(glm::vec3(1.5, 0, 1), 0.5, MetalMaterial(glm::vec3(0.42, 0.76, 0.23), 0.2)),
+		Sphere(glm::vec3(-1.5, 0, 1), 0.5, DielectricMaterial(1.0)),
+		Sphere(glm::vec3(0, -1000.5, 1), 1000, LambertianMaterial(glm::vec3(0.3, 0.6, 0.45), 0.6))
 	};
-	camera = Camera(90, aspectRatio, SettingsProvider::Instance.GetLookFrom(), Point3d(0, 0, 0));
-	image = Image(SizeU(clientSize.x, clientSize.y));
+	camera = Camera(90, aspectRatio, SettingsProvider::Instance.GetLookFrom(), glm::vec3(0, 0, 0));
+	image = Image(glm::uvec2(clientSize.x, clientSize.y));
 
 	renderThread = CreateRenderThread();
 
@@ -42,7 +42,7 @@ RenderView::RenderView(wxWindow* parent, wxWindowID id, const wxPoint& position,
 			}
 
 			renderThread = {};
-			image.SetColor(Color(0, 0, 0));
+			image.SetColor(glm::vec3(0, 0, 0));
 			renderThread = CreateRenderThread();
 		});
 }
@@ -62,7 +62,7 @@ void RenderView::OnResize(wxSizeEvent& event)
 
 	camera.SetAspectRatio(aspectRatio);
 
-	image = Image(SizeU(size.x, size.y));
+	image = Image(glm::uvec2(size.x, size.y));
 
 	renderThread = CreateRenderThread();
 }
@@ -79,15 +79,15 @@ void RenderView::Render()
 		samplesTakenCopy = samplesTaken;
 	}
 
-	SizeU size = imageCopy.GetSize();
+	glm::uvec2 size = imageCopy.GetSize();
 
-	std::vector<unsigned char> colors(size.height * size.width * 3, 0);
+	std::vector<unsigned char> colors(size.x * size.y * 3, 0);
 
 	if (samplesTakenCopy != 0)
 	{
-		for (size_t n = 0; n != (size_t)size.height * size.width; ++n)
+		for (size_t n = 0; n != (size_t)size.x * size.y; ++n)
 		{
-			Color color = (imageCopy[n] / samplesTakenCopy).GetGammaCorrected();
+			glm::vec3 color = glm::sqrt((imageCopy[n] / (float)samplesTakenCopy));
 			colors[3 * n] = round(color.r * 255);
 			colors[3 * n + 1] = round(color.g * 255);
 			colors[3 * n + 2] = round(color.b * 255);
@@ -95,7 +95,7 @@ void RenderView::Render()
 	}
 
 	wxAutoBufferedPaintDC dc(this);
-	wxImage wxImage(wxSize(size.width, size.height), colors.data(), nullptr, true);
+	wxImage wxImage(wxSize(size.x, size.y), colors.data(), nullptr, true);
 	wxBitmap bitmap(wxImage, dc);
 
 	dc.DrawBitmap(bitmap, wxPoint(0, 0));

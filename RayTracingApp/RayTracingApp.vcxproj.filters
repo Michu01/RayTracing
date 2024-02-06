@@ -21,9 +21,6 @@
     <ClInclude Include="MainFrame.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="Conversions.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="RenderView.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>

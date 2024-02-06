@@ -26,7 +26,7 @@ private:
 	void EmitEvent(const T& value, Settings settings);
 
 public:
-	Point3d GetLookFrom() const;
+	glm::vec3 GetLookFrom() const;
 };
 
 template<class T>

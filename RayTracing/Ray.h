@@ -1,20 +1,20 @@
 #pragma once
 
-#include "Vector3.h"
-#include "Color.h"
-#include "Random.h"
-
 #include <limits>
+
+#include <glm/glm.hpp>
+
+#include "Random.h"
 
 struct Ray
 {
-	Point3d origin;
-	Vector3d direction;
+	glm::vec3 origin;
+	glm::vec3 direction;
 
 public:
 	Ray();
 
-	Ray(const Point3d& origin, const Vector3d& direction);
+	Ray(const glm::vec3& origin, const glm::vec3& direction);
 
-	Point3d At(double t) const;
+	glm::vec3 At(float t) const;
 };

@@ -4,30 +4,29 @@
 #include "Renderer.h"
 #include "SphereCollection.h"
 #include "Materials.h"
-#include "Vector3.h"
 
 static void Test1(size_t samplesPerPixel = 8)
 {
-	Material material1 = LambertianMaterial(Color(191, 21, 21), 1.0);
-	Material material2 = LambertianMaterial(Color(117, 76, 15), 1.0);
-	Material material3 = MetalMaterial(Color(131, 145, 201), 0.2);
-	Material material4 = DielectricMaterial(1.5);
+	Material material1 = LambertianMaterial(glm::vec3(191, 21, 21), 1.0f);
+	Material material2 = LambertianMaterial(glm::vec3(117, 76, 15), 1.0f);
+	Material material3 = MetalMaterial(glm::vec3(131, 145, 201), 0.2f);
+	Material material4 = DielectricMaterial(1.5f);
 
 	SphereCollection collection
 	{
-		Sphere(Point3d(0, 0, -2), 0.5, material1),
-		Sphere(Point3d(0, -100.5, -1), 100, material2),
-		Sphere(Point3d(-1.1, 0, -2), 0.5, material3),
-		Sphere(Point3d(1.1, 0, -2), 0.5, material4)
+		Sphere(glm::vec3(0, 0, -2), 0.5, material1),
+		Sphere(glm::vec3(0, -100.5, -1), 100, material2),
+		Sphere(glm::vec3(-1.1, 0, -2), 0.5, material3),
+		Sphere(glm::vec3(1.1, 0, -2), 0.5, material4)
 	};
 
-    SizeU imageSize(800, 800);
+    glm::uvec2 imageSize(800, 800);
 
-    double vFov = 90;
-    double aspectRatio = GetAspectRatio(imageSize);
+    float vFov = 90;
+    float aspectRatio = (float)imageSize.x / imageSize.y;
 
-    Point3d lookFrom(-2, 2, 1);
-    Point3d lookAt(0, 0, -1);
+    glm::vec3 lookFrom(-2, 2, 1);
+    glm::vec3 lookAt(0, 0, -1);
 
     Camera camera(vFov, aspectRatio, lookFrom, lookAt);
 
@@ -42,11 +41,11 @@ static void Test2(size_t samplesPerPixel = 8)
 {
     SphereCollection collection;
 
-    Material groundMaterial = LambertianMaterial(Color(0.5, 0.5, 0.5), 0.5);
+    Material groundMaterial = LambertianMaterial(glm::vec3(0.5, 0.5, 0.5), 0.5);
 
-    collection.Add(Sphere(Point3d(0, -1000, -3), 1000, groundMaterial));
+    collection.Add(Sphere(glm::vec3(0, -1000, -3), 1000, groundMaterial));
 
-    auto random = [](double max = 1.0) { return Random::Instance.RandomDouble(std::uniform_real_distribution(0.0, max)); };
+    auto random = [](float max = 1.0) { return Random::Instance.Float(std::uniform_real_distribution(0.0f, max)); };
 
     int d = 9;
 
@@ -54,25 +53,25 @@ static void Test2(size_t samplesPerPixel = 8)
     {
         for (int b = -d; b < d; b++)
         {
-            Point3d center(a + 0.9 * random(), 0.2, b + 0.9 * random());
+            glm::vec3 center(a + 0.9 * random(), 0.2, b + 0.9 * random());
 
-            if ((center - Point3d(4, 0.2, 0)).GetLength() < 0.9)
+            if (glm::length(center - glm::vec3(4, 0.2, 0)) < 0.9)
             {
                 continue;
             }
 
             std::unique_ptr<Material> material;
-            double choice = random();
+            float choice = random();
 
             if (choice < 0.8) 
             {
-                Color color = Random::Instance.RandomColor();
+                glm::vec3 color = Random::Instance.Color();
                 material = std::make_unique<Material>(LambertianMaterial(color, 0.5));
             }
             else if (choice < 0.95) 
             {
-                Color albedo = Random::Instance.RandomColor();
-                double fuzz = random(0.5);
+                glm::vec3 albedo = Random::Instance.Color();
+                float fuzz = random(0.5);
                 material = std::make_unique<Material>(MetalMaterial(albedo, fuzz));
             }
             else 
@@ -80,29 +79,27 @@ static void Test2(size_t samplesPerPixel = 8)
                 material = std::make_unique<Material>(DielectricMaterial(1.5));
             }
 
-            collection.Add(Sphere(center, 0.2, *material));
+            collection.Add(Sphere(center, 0.2f, *material));
         }
     }
 
     Material material1 = DielectricMaterial(1.5);
-    collection.Add(Sphere(Point3d(0, 1, 0), 1.0, material1));
+    collection.Add(Sphere(glm::vec3(0, 1, 0), 1.0, material1));
 
-    Material material2 = LambertianMaterial(Color(0.4, 0.2, 0.1), 0.5);
-    collection.Add(Sphere(Point3d(-4, 1, 0), 1.0, material2));
+    Material material2 = LambertianMaterial(glm::vec3(0.4, 0.2, 0.1), 0.5);
+    collection.Add(Sphere(glm::vec3(-4, 1, 0), 1.0, material2));
 
-    Material material3 = MetalMaterial(Color(0.7, 0.6, 0.5), 0.0);
-    collection.Add(Sphere(Point3d(4, 1, 0), 1.0, material3));
+    Material material3 = MetalMaterial(glm::vec3(0.7, 0.6, 0.5), 0.0);
+    collection.Add(Sphere(glm::vec3(4, 1, 0), 1.0, material3));
 
-    double aspectRatio = 16.0 / 9.0;
+    float aspectRatio = 16.0f / 9.0f;
 
-    SizeU imageSize;
-    imageSize.width = 1920;
-    imageSize.height = 1080;
+    glm::uvec2 imageSize(1920, 1080);
 
-    double vFov = 20;
+    float vFov = 20;
 
-    Point3d lookFrom(13, 2, 3);
-    Point3d lookAt(0, 0, 0);
+    glm::vec3 lookFrom(13, 2, 3);
+    glm::vec3 lookAt(0, 0, 0);
 
     Camera camera(vFov, aspectRatio, lookFrom, lookAt);
 

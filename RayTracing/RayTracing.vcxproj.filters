@@ -16,21 +16,15 @@
     <Filter Include="Pliki nagłówkowe\Materials">
       <UniqueIdentifier>{87ee9e5d-f895-428d-9d31-6500ecabb93c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki źródłowe\Materials">
+      <UniqueIdentifier>{d8d4f84f-be6b-43ed-868c-745aae5fafab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PPM_ImageSaver.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="Color.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="Size.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
@@ -60,9 +54,6 @@
     <ClInclude Include="HitResult.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="DegreesToRadians.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="LambertianMaterial.h">
       <Filter>Pliki nagłówkowe\Materials</Filter>
     </ClInclude>
@@ -81,9 +72,6 @@
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="Color.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
@@ -107,14 +95,14 @@
     <ClCompile Include="Random.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="DielectricMaterial.cpp">
+      <Filter>Pliki źródłowe\Materials</Filter>
+    </ClCompile>
     <ClCompile Include="LambertianMaterial.cpp">
-      <Filter>Pliki źródłowe</Filter>
+      <Filter>Pliki źródłowe\Materials</Filter>
     </ClCompile>
     <ClCompile Include="MetalMaterial.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="DielectricMaterial.cpp">
-      <Filter>Pliki źródłowe</Filter>
+      <Filter>Pliki źródłowe\Materials</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

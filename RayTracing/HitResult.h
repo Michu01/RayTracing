@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Vector3.h"
+#include <glm/glm.hpp>
+
 #include "Materials.h"
 
 struct HitResult
 {
-	Point3d p;
-	Vector3d normal;
-	double t{};
+	glm::vec3 p;
+	glm::vec3 normal;
+	float t{};
 	bool isFrontFace{};
 	const Material* material;
 };

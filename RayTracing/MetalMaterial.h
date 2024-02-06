@@ -2,7 +2,6 @@
 
 #include <optional>
 
-#include "Color.h"
 #include "Ray.h"
 
 struct HitResult;
@@ -10,11 +9,11 @@ struct HitResult;
 class MetalMaterial
 {
 private:
-	Color color;
-	double fuzz;
+	glm::vec3 color;
+	float fuzz;
 
 public:
-	MetalMaterial(const Color& color, double fuzz);
+	MetalMaterial(const glm::vec3& color, float fuzz);
 
-	std::optional<std::pair<Color, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;
+	std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;
 };

@@ -1,18 +1,18 @@
 #include "Sphere.h"
 #include "Ray.h"
 
-Sphere::Sphere(const Point3d& center, double radius, const Material& material) : 
+Sphere::Sphere(const glm::vec3& center, float radius, const Material& material) : 
 	center{ center }, radius{ radius }, material{ material }
 {
 }
 
 std::optional<HitResult> Sphere::Hit(const Ray& ray, Range range) const
 {
-	Vector3d oc = ray.origin - center;
-	double a = ray.direction.GetLengthSquared();
-	double halfB = DotProduct(oc, ray.direction);
-	double c = oc.GetLengthSquared() - radius * radius;
-	double discriminant = halfB * halfB - a * c;
+	glm::vec3 oc = ray.origin - center;
+	float a = pow(glm::length(ray.direction), 2.0f);
+	float halfB = glm::dot(oc, ray.direction);
+	float c = pow(glm::length(oc), 2.0f) - radius * radius;
+	float discriminant = halfB * halfB - a * c;
 
 	if (discriminant < 0)
 	{
@@ -31,9 +31,9 @@ std::optional<HitResult> Sphere::Hit(const Ray& ray, Range range) const
 		}
 	}
 
-	Point3d p = ray.At(root);
-	Vector3d normal = (p - center) / radius;
-	bool isFrontFace = DotProduct(ray.direction, normal) < 0.0;
+	glm::vec3 p = ray.At(root);
+	glm::vec3 normal = (p - center) / radius;
+	bool isFrontFace = glm::dot(ray.direction, normal) < 0.0;
 
 	HitResult result;
 	result.t = root;

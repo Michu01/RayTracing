@@ -9,13 +9,13 @@ struct HitResult;
 class DielectricMaterial
 {
 private:
-	double refraction;
+	float refraction;
 
 private:
-	static double GetReflectance(double cos, double ref);
+	static float GetReflectance(float cos, float ref);
 
 public:
-	DielectricMaterial(double refraction);
+	DielectricMaterial(float refraction);
 
-	std::optional<std::pair<Color, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;	
+	std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;	
 };

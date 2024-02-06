@@ -6,13 +6,15 @@ void PPM_ImageSaver::SaveImage(const Image& image, const std::string& filename) 
 
 	std::ofstream file(filename);
 
+	glm::uvec2 size = image.GetSize();
+
 	file << "P3\n";
-	file << image.GetWidth() << " " << image.GetHeight() << "\n";
+	file << size.x << " " << size.y << "\n";
 	file << "255\n";
 
-	const std::vector<Color>& pixels = image.GetPixels();
+	const std::vector<glm::vec3>& pixels = image.GetPixels();
 
-	for (size_t i = 0; i != image.GetWidth() * image.GetHeight(); ++i)
+	for (size_t i = 0; i != (size_t)size.x * size.y; ++i)
 	{
 		file << (unsigned)round(pixels[i].r * 255) << " " << (unsigned)round(pixels[i].g * 255) << " " << (unsigned)round(pixels[i].b * 255) << "\n";
 	}

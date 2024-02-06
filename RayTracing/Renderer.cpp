@@ -1,20 +1,20 @@
 #include "Renderer.h"
 
-void Renderer::LogProgress(std::atomic_uint& i, const SizeU& imageSize, std::stop_token stopToken) const
+void Renderer::LogProgress(std::atomic_uint& i, glm::uvec2 imageSize, std::stop_token stopToken) const
 {
     std::cout << "Render started...\n";
 
-    unsigned n = imageSize.height * imageSize.width * (unsigned)samplesPerPixel;
+    unsigned n = imageSize.x * imageSize.y * (unsigned)samplesPerPixel;
     auto start = std::chrono::steady_clock::now();
 
     auto logProgressLocal = [&i, n, start]()
         {
-            double progress = 100.0 * i / n;
+            float progress = 100.0f * i / n;
             auto elapsed = std::chrono::steady_clock::now() - start;
-            auto left = i == 0 ? std::chrono::steady_clock::duration::max() : elapsed * ((double)n / i - 1.0);
+            auto left = i == 0 ? std::chrono::steady_clock::duration::max() : elapsed * ((float)n / i - 1.0);
 
             std::cout << i << "/" << n << " (" << std::setprecision(4) << progress << "%), time left: " 
-                << std::chrono::duration<double>(left) << "\n";
+                << std::chrono::duration<float>(left) << "\n";
         };
 
     SleepFor(logDelay, stopToken);
@@ -26,17 +26,17 @@ void Renderer::LogProgress(std::atomic_uint& i, const SizeU& imageSize, std::sto
         SleepFor(logDelay, stopToken);
     }
 
-    std::cout << "Render finished! Total time: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - start) << "\n";
+    std::cout << "Render finished! Total time: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - start) << "\n";
 }
 
-Color Renderer::GetRayColor(const Ray& ray, const SphereCollection& sphereCollection, size_t bounces) const
+glm::vec3 Renderer::GetRayColor(const Ray& ray, const SphereCollection& sphereCollection, size_t bounces) const
 {
     if (bounces == bounceLimit)
     {
-        return Color(0, 0, 0);
+        return glm::vec3(0, 0, 0);
     }
 
-    std::optional<HitResult> hitResult = sphereCollection.Hit(ray, Range(0.001, std::numeric_limits<double>::max()));
+    std::optional<HitResult> hitResult = sphereCollection.Hit(ray, Range(0.001f, std::numeric_limits<float>::max()));
 
     if (hitResult)
     {
@@ -51,12 +51,12 @@ Color Renderer::GetRayColor(const Ray& ray, const SphereCollection& sphereCollec
             return color * GetRayColor(scatteredRay, sphereCollection, bounces + 1);
         }
 
-        return Color(0, 0, 0);
+        return glm::vec3(0, 0, 0);
     }
 
-    double a = 0.5 * (ray.direction.Normalize().y + 1.0);
+    float a = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
 
-    Color color = (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
+    glm::vec3 color = (1.0f - a) * glm::vec3(1.0, 1.0, 1.0) + a * glm::vec3(0.5, 0.7, 1.0);
 
     return color;
 }
@@ -71,7 +71,7 @@ Renderer::Renderer() :
 {
 }
 
-Image Renderer::Render(const SizeU& imageSize, const Camera& camera, const SphereCollection& sphereCollection) const
+Image Renderer::Render(glm::uvec2 imageSize, const Camera& camera, const SphereCollection& sphereCollection) const
 {
     //std::chrono::steady_clock::time_point start;
     //start = std::chrono::steady_clock::now();
@@ -85,19 +85,19 @@ Image Renderer::Render(const SizeU& imageSize, const Camera& camera, const Spher
     auto createRay = [&camera, imageSize](size_t row, size_t column) { return camera.CreateRay(imageSize, row, column); };
     auto getRayColor = [this, &sphereCollection](Ray&& ray) { return GetRayColor(ray, sphereCollection); };
 
-    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.height * imageSize.width);
+    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.x * imageSize.y);
     
     size_t index = 0;
 
-    for (size_t row = 0; row != imageSize.height; ++row)
+    for (size_t row = 0; row != imageSize.y; ++row)
     {
-        for (size_t col = 0; col != imageSize.width; ++col, ++index)
+        for (size_t col = 0; col != imageSize.x; ++col, ++index)
         {
             coords[index] = { row, col, index };
         }
     }
 
-    //std::cout << "Phase 1: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - start) << "\n";
+    //std::cout << "Phase 1: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - start) << "\n";
     //start = std::chrono::steady_clock::now();
 
     for (size_t n = 0; n != samplesPerPixel; ++n)
@@ -107,7 +107,7 @@ Image Renderer::Render(const SizeU& imageSize, const Camera& camera, const Spher
             {
                 Ray ray = createRay(std::get<0>(coords), std::get<1>(coords));
 
-                Color color = getRayColor(std::move(ray));
+                glm::vec3 color = getRayColor(std::move(ray));
 
                 image[std::get<2>(coords)] += color;
 
@@ -115,17 +115,17 @@ Image Renderer::Render(const SizeU& imageSize, const Camera& camera, const Spher
             });
     }
 
-    //std::cout << "Phase 2: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - start) << "\n";
+    //std::cout << "Phase 2: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - start) << "\n";
     //start = std::chrono::steady_clock::now();
 
-    std::vector<Color>& pixels = image.GetPixels();
+    std::vector<glm::vec3>& pixels = image.GetPixels();
 
-    std::for_each(std::execution::par_unseq, pixels.begin(), pixels.end(), [this](Color& color)
+    std::for_each(std::execution::par_unseq, pixels.begin(), pixels.end(), [this](glm::vec3& color)
         {
-            color = (color / (double)samplesPerPixel).GetGammaCorrected();
+            color = glm::sqrt(color / (float)samplesPerPixel);
         });
 
-    //std::cout << "Phase 3: " << std::chrono::duration<double>(std::chrono::steady_clock::now() - start) << "\n";
+    //std::cout << "Phase 3: " << std::chrono::duration<float>(std::chrono::steady_clock::now() - start) << "\n";
 
     return image;
 }
@@ -142,13 +142,13 @@ void Renderer::Render(Image& image, const Camera& camera, const SphereCollection
     auto createRay = [&camera, imageSize](size_t row, size_t column) { return camera.CreateRay(imageSize, row, column); };
     auto getRayColor = [this, &sphereCollection](Ray&& ray) { return GetRayColor(ray, sphereCollection); };
 
-    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.height * imageSize.width);
+    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.x * imageSize.y);
 
     size_t index = 0;
 
-    for (size_t row = 0; row != imageSize.height; ++row)
+    for (size_t row = 0; row != imageSize.y; ++row)
     {
-        for (size_t col = 0; col != imageSize.width; ++col, ++index)
+        for (size_t col = 0; col != imageSize.x; ++col, ++index)
         {
             coords[index] = { row, col, index };
         }
@@ -159,7 +159,7 @@ void Renderer::Render(Image& image, const Camera& camera, const SphereCollection
         {
             Ray ray = createRay(std::get<0>(coords), std::get<1>(coords));
 
-            Color color = getRayColor(std::move(ray));
+            glm::vec3 color = getRayColor(std::move(ray));
 
             image[std::get<2>(coords)] += color;
         });
@@ -170,18 +170,18 @@ size_t Renderer::GetSamplesPerPixel() const
     return samplesPerPixel;
 }
 
-std::function<void(Image&)> Renderer::GetRenderFunction(const SizeU& imageSize, const Camera& camera, const SphereCollection& sphereCollection) const
+std::function<void(Image&)> Renderer::GetRenderFunction(glm::uvec2 imageSize, const Camera& camera, const SphereCollection& sphereCollection) const
 {
     auto createRay = [&camera, imageSize](size_t row, size_t column) { return camera.CreateRay(imageSize, row, column); };
     auto getRayColor = [this, &sphereCollection](Ray&& ray) { return GetRayColor(ray, sphereCollection); };
 
-    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.height * imageSize.width);
+    std::vector<std::tuple<size_t, size_t, size_t>> coords(imageSize.x * imageSize.y);
 
     size_t index = 0;
 
-    for (size_t row = 0; row != imageSize.height; ++row)
+    for (size_t row = 0; row != imageSize.y; ++row)
     {
-        for (size_t col = 0; col != imageSize.width; ++col, ++index)
+        for (size_t col = 0; col != imageSize.x; ++col, ++index)
         {
             coords[index] = { row, col, index };
         }
@@ -194,7 +194,7 @@ std::function<void(Image&)> Renderer::GetRenderFunction(const SizeU& imageSize, 
                 {
                     Ray ray = createRay(std::get<0>(coords), std::get<1>(coords));
 
-                    Color color = getRayColor(std::move(ray));
+                    glm::vec3 color = getRayColor(std::move(ray));
 
                     image[std::get<2>(coords)] += color;
                 });

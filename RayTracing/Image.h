@@ -4,44 +4,43 @@
 #include <cassert>
 #include <execution>
 
-#include "Size.h"
-#include "Color.h"
+#include <glm/glm.hpp>
 
 class Image
 {
 private:
-	SizeU size;
-	std::vector<Color> pixels;
+	glm::uvec2 size;
+	std::vector<glm::vec3> pixels;
 
 public:
 	Image();
 
-	Image(SizeU size);
+	Image(glm::uvec2 size);
 
-	Image(SizeU size, std::initializer_list<Color> pixels);
+	Image(glm::uvec2 size, std::initializer_list<glm::vec3> pixels);
 
 	template<class Container>
-	Image(SizeU size, const Container& container);
+	Image(glm::uvec2 size, const Container& container);
 
-	Color& operator[](size_t n);
+	glm::vec3& operator[](size_t n);
 
-	const Color& operator[](size_t n) const;
+	const glm::vec3& operator[](size_t n) const;
 
-	const std::vector<Color>& GetPixels() const;
+	const std::vector<glm::vec3>& GetPixels() const;
 
-	std::vector<Color>& GetPixels();
+	std::vector<glm::vec3>& GetPixels();
 
-	void SetColor(const Color& color);
+	void SetColor(const glm::vec3& color);
 
-	size_t GetWidth() const;
+	glm::uint GetWidth() const;
 
-	size_t GetHeight() const;
+	glm::uint GetHeight() const;
 
-	SizeU GetSize() const;
+	glm::uvec2 GetSize() const;
 };
 
 template<class Container>
-inline Image::Image(SizeU size, const Container& container) :
+inline Image::Image(glm::uvec2 size, const Container& container) :
 	size{ size }, pixels(container.cbegin(), container.cend())
 {
 }

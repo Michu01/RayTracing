@@ -2,7 +2,6 @@
 
 #include <optional>
 
-#include "Color.h"
 #include "Ray.h"
 
 struct HitResult;
@@ -10,12 +9,12 @@ struct HitResult;
 class LambertianMaterial
 {
 private:
-	Color color;
-	double reflectance;
+	glm::vec3 color;
+	float reflectance;
 
 public:
-	LambertianMaterial(Color color, double reflectance);
+	LambertianMaterial(const glm::vec3& color, float reflectance);
 
-	std::optional<std::pair<Color, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;
+	std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;
 };
 

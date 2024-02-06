@@ -8,12 +8,12 @@
 class Sphere
 {
 private:
-	Point3d center;
-	double radius;
+	glm::vec3 center;
+	float radius;
 	Material material;
 
 public:
-	Sphere(const Point3d& center, double radius, const Material& material);
+	Sphere(const glm::vec3& center, float radius, const Material& material);
 
 	std::optional<HitResult> Hit(const Ray& ray, Range range) const;
 };

@@ -1,17 +1,17 @@
 #include "MetalMaterial.h"
 #include "HitResult.h"
 
-MetalMaterial::MetalMaterial(const Color& color, double fuzz) :
+MetalMaterial::MetalMaterial(const glm::vec3& color, float fuzz) :
     color{ color }, fuzz{ fuzz }
 {
 }
 
-std::optional<std::pair<Color, Ray>> MetalMaterial::Scatter(const Ray& inputRay, const HitResult& hitResult) const
+std::optional<std::pair<glm::vec3, Ray>> MetalMaterial::Scatter(const Ray& inputRay, const HitResult& hitResult) const
 {
-    Vector3d reflected = inputRay.direction.Reflect(hitResult.normal);
-    Ray scatteredRay(hitResult.p, reflected + fuzz * Random::Instance.RandomUnitVector3d());
+    glm::vec3 reflected = glm::reflect(inputRay.direction, hitResult.normal);
+    Ray scatteredRay(hitResult.p, reflected + fuzz * Random::Instance.UnitVec3());
 
-    if (DotProduct(scatteredRay.direction, hitResult.normal) <= 0.0)
+    if (glm::dot(scatteredRay.direction, hitResult.normal) <= 0.0)
     {
         return {};
     }

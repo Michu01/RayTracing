@@ -1,56 +1,57 @@
 #include "Image.h"
 
-Image::Image()
+Image::Image() :
+    size{}
 {
 }
 
-Image::Image(SizeU size) :
-    size{ size }, pixels(size.width * size.height)
+Image::Image(glm::uvec2 size) :
+    size{ size }, pixels(size.x * size.y)
 {
 }
 
-Image::Image(SizeU size, std::initializer_list<Color> pixels) :
+Image::Image(glm::uvec2 size, std::initializer_list<glm::vec3> pixels) :
     size{ size }, pixels{ pixels }
 {
-    assert(size.width * size.height == pixels.size());
+    assert(size.x * size.y == pixels.size());
 }
 
-Color& Image::operator[](size_t n)
+glm::vec3& Image::operator[](size_t n)
 {
     return pixels[n];
 }
 
-const Color& Image::operator[](size_t n) const
+const glm::vec3& Image::operator[](size_t n) const
 {
     return pixels[n];
 }
 
-const std::vector<Color>& Image::GetPixels() const
+const std::vector<glm::vec3>& Image::GetPixels() const
 {
     return pixels;
 }
 
-std::vector<Color>& Image::GetPixels()
+std::vector<glm::vec3>& Image::GetPixels()
 {
     return pixels;
 }
 
-void Image::SetColor(const Color& color)
+void Image::SetColor(const glm::vec3& color)
 {
     std::fill(std::execution::par_unseq, pixels.begin(), pixels.end(), color);
 }
 
-size_t Image::GetWidth() const
+glm::uint Image::GetWidth() const
 {
-    return size.width;
+    return size.x;
 }
 
-size_t Image::GetHeight() const
+glm::uint Image::GetHeight() const
 {
-    return size.height;
+    return size.y;
 }
 
-SizeU Image::GetSize() const
+glm::uvec2 Image::GetSize() const
 {
     return size;
 }

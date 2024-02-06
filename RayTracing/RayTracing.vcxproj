@@ -136,8 +136,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="DegreesToRadians.h" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="HitResult.h" />
     <ClInclude Include="Image.h" />
@@ -150,14 +148,11 @@
     <ClInclude Include="Range.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Size.h" />
     <ClInclude Include="SleepFor.h" />
     <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Color.cpp" />
     <ClCompile Include="DielectricMaterial.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="LambertianMaterial.cpp" />

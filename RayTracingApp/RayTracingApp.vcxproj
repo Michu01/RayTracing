@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="Conversions.h" />
     <ClInclude Include="MainFrame.h" />
     <ClInclude Include="MinMaxDefaultValue.h" />
     <ClInclude Include="Property.h" />

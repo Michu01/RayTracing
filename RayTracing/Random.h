@@ -3,8 +3,7 @@
 #include <random>
 #include <numbers>
 
-#include "Vector3.h"
-#include "Color.h"
+#include <glm/glm.hpp>
 
 class Random
 {
@@ -15,12 +14,10 @@ public:
 	static Random Instance;
 
 public:
-	double RandomDouble(std::uniform_real_distribution<double> distribution);
+	float Float(std::uniform_real_distribution<float> distribution);
 
-	Vector3d RandomUnitVector3d();
+	glm::vec3 UnitVec3();
 
-	Vector3d RandomUnitVector3dInHemisphere(const Vector3d& normal);
-
-	Color RandomColor();
+	glm::vec3 Color();
 };
 
