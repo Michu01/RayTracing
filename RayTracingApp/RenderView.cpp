@@ -7,20 +7,30 @@ RenderView::RenderView(wxWindow* parent, wxWindowID id, const wxPoint& position,
 
 	Bind(wxEVT_PAINT, &RenderView::OnPaint, this);
 	Bind(wxEVT_SIZE, &RenderView::OnResize, this);
+	Bind(wxEVT_MOTION, &RenderView::OnMotion, this);
+	Bind(wxEVT_ENTER_WINDOW, &RenderView::OnEnterWindow, this);
+	Bind(wxEVT_LEAVE_WINDOW, &RenderView::OnLeaveWindow, this);
+	Bind(wxEVT_KEY_DOWN, &RenderView::OnKeyDown, this);
+	Bind(wxEVT_KEY_UP, &RenderView::OnKeyUp, this);
+	Bind(wxEVT_MIDDLE_DOWN, &RenderView::OnMiddleDown, this);
+	Bind(wxEVT_MIDDLE_UP, &RenderView::OnMiddleUp, this);
+	Bind(wxEVT_MOUSEWHEEL, &RenderView::OnMouseWheel, this);
 
 	wxSize clientSize = GetClientSize();
 
 	double aspectRatio = (double)clientSize.x / clientSize.y;
 
 	renderer = Renderer(SettingsProvider::Instance.SamplesPerPixel.Get(), bounceLimit, std::chrono::duration<long long>::max());
-	collection = SphereCollection
+	SpheresGenerator generator;
+	collection = generator.Generate({});
+	/*collection = SphereCollection
 	{
 		Sphere(glm::vec3(0, 0, 1), 0.5, LambertianMaterial(glm::vec3(0.7, 0.5, 0.8), 0.5)),
 		Sphere(glm::vec3(1.5, 0, 1), 0.5, MetalMaterial(glm::vec3(0.42, 0.76, 0.23), 0.2)),
-		Sphere(glm::vec3(-1.5, 0, 1), 0.5, DielectricMaterial(1.0)),
+		Sphere(glm::vec3(-1.5, 0, 1), 0.5, DielectricMaterial(1.5)),
 		Sphere(glm::vec3(0, -1000.5, 1), 1000, LambertianMaterial(glm::vec3(0.3, 0.6, 0.45), 0.6))
-	};
-	camera = Camera(90, aspectRatio, SettingsProvider::Instance.GetLookFrom(), glm::vec3(0, 0, 0));
+	};*/
+	camera = Camera(90, aspectRatio, SettingsProvider::Instance.GetLookFrom(), glm::vec3(0, 0, -1));
 	image = Image(glm::uvec2(clientSize.x, clientSize.y));
 
 	renderThread = CreateRenderThread();
@@ -34,15 +44,9 @@ RenderView::RenderView(wxWindow* parent, wxWindowID id, const wxPoint& position,
 			case Settings::SamplesPerPixel:
 				renderer.SetSamplesPerPixel(event.GetValue<size_t>());
 				break;
-			case Settings::LookFromX:
-			case Settings::LookFromY:
-			case Settings::LookFromZ:
-				camera.SetLookFrom(SettingsProvider::Instance.GetLookFrom());
-				break;
 			}
 
 			renderThread = {};
-			image.SetColor(glm::vec3(0, 0, 0));
 			renderThread = CreateRenderThread();
 		});
 }
@@ -54,16 +58,86 @@ void RenderView::OnPaint(wxPaintEvent& event)
 
 void RenderView::OnResize(wxSizeEvent& event)
 {
-	renderThread = {};
-
 	wxSize size = GetClientSize();
 
 	double aspectRatio = (double)size.x / size.y;
 
 	camera.SetAspectRatio(aspectRatio);
 
-	image = Image(glm::uvec2(size.x, size.y));
+	renderThread = {};
+	renderThread = CreateRenderThread();
+}
 
+void RenderView::OnMotion(wxMouseEvent& event)
+{
+	wxPoint point = event.GetPosition();
+
+	if (!lastPoint)
+	{
+		lastPoint = point;
+		return;
+	}
+
+	wxPoint offset = point - lastPoint.value();
+	lastPoint = point;
+
+	wxSize size = GetClientSize();
+
+	glm::vec3 offsetScaled((float)offset.x / size.x, (float)offset.y / size.y, 0);
+
+	if (rotationCenter)
+	{
+		glm::vec3 rotationCenterScaled(rotationCenter.value().x / size.x, rotationCenter.value().y / size.y, 0);
+
+		camera.Rotate(rotationCenterScaled, offsetScaled);
+
+		renderThread = {};
+		renderThread = CreateRenderThread();
+	}
+	else if (event.ShiftDown())
+	{
+		camera.Move(offsetScaled);
+
+		renderThread = {};
+		renderThread = CreateRenderThread();
+	}
+}
+
+void RenderView::OnEnterWindow(wxMouseEvent& event)
+{
+	lastPoint = event.GetPosition();
+}
+
+void RenderView::OnLeaveWindow(wxMouseEvent& event)
+{
+	lastPoint = {};
+}
+
+void RenderView::OnKeyDown(wxKeyEvent& event)
+{
+	
+}
+
+void RenderView::OnKeyUp(wxKeyEvent& event)
+{
+	
+}
+
+void RenderView::OnMiddleUp(wxMouseEvent& event)
+{
+	rotationCenter = {};
+}
+
+void RenderView::OnMiddleDown(wxMouseEvent& event)
+{
+	rotationCenter = event.GetPosition();
+}
+
+void RenderView::OnMouseWheel(wxMouseEvent& event)
+{
+	camera.Zoom(-(float)event.GetWheelRotation() / event.GetWheelDelta());
+
+	renderThread = {};
 	renderThread = CreateRenderThread();
 }
 
@@ -88,9 +162,9 @@ void RenderView::Render()
 		for (size_t n = 0; n != (size_t)size.x * size.y; ++n)
 		{
 			glm::vec3 color = glm::sqrt((imageCopy[n] / (float)samplesTakenCopy));
-			colors[3 * n] = round(color.r * 255);
-			colors[3 * n + 1] = round(color.g * 255);
-			colors[3 * n + 2] = round(color.b * 255);
+			colors[3 * n] = round(glm::clamp(color.r, 0.0f, 1.0f) * 255);
+			colors[3 * n + 1] = round(glm::clamp(color.g, 0.0f, 1.0f) * 255);
+			colors[3 * n + 2] = round(glm::clamp(color.b, 0.0f, 1.0f) * 255);
 		}
 	}
 
@@ -101,16 +175,18 @@ void RenderView::Render()
 	dc.DrawBitmap(bitmap, wxPoint(0, 0));
 }
 
-void RenderView::RenderLoop(std::stop_token stopToken, Image imageCopy, Camera cameraCopy)
+void RenderView::RenderLoop(std::stop_token stopToken)
 {
-	auto render = renderer.GetRenderFunction(imageCopy.GetSize(), cameraCopy, collection);
+	auto clientSize = GetClientSize();
+	Image localImage(glm::uvec2(clientSize.x, clientSize.y));
+	auto render = renderer.GetRenderFunction(localImage.GetSize(), camera, collection);
 	size_t samplesPerPixel = renderer.GetSamplesPerPixel();
 
 	samplesTaken = 0;
 
 	while (samplesTaken != samplesPerPixel)
 	{
-		render(imageCopy);
+		render(localImage);
 
 		if (stopToken.stop_requested())
 		{
@@ -120,7 +196,7 @@ void RenderView::RenderLoop(std::stop_token stopToken, Image imageCopy, Camera c
 		{
 			std::lock_guard imageLock(imageMutex);
 
-			image = imageCopy;
+			image = localImage;
 			++samplesTaken;
 		}
 
@@ -130,5 +206,5 @@ void RenderView::RenderLoop(std::stop_token stopToken, Image imageCopy, Camera c
 
 std::unique_ptr<std::jthread> RenderView::CreateRenderThread()
 {
-	return std::make_unique<std::jthread>([this](std::stop_token stopToken) { RenderLoop(stopToken, image, camera); });
+	return std::make_unique<std::jthread>([this](std::stop_token stopToken) { RenderLoop(stopToken); });
 }

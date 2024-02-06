@@ -5,7 +5,12 @@ float DielectricMaterial::GetReflectance(float cos, float ref)
 {
     float r = (1 - ref) / (1 + ref);
     float rs = r * r;
-    return rs + (1 - rs) * pow(1 - cos, 5);
+    return rs + (1 - rs) * pow(1 - cos, 5.0f);
+}
+
+DielectricMaterial::DielectricMaterial() :
+    refraction{}
+{
 }
 
 DielectricMaterial::DielectricMaterial(float refraction) :

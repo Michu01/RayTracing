@@ -38,27 +38,32 @@ glm::vec3 Renderer::GetRayColor(const Ray& ray, const SphereCollection& sphereCo
 
     std::optional<HitResult> hitResult = sphereCollection.Hit(ray, Range(0.001f, std::numeric_limits<float>::max()));
 
-    if (hitResult)
+    if (!hitResult)
     {
-        const HitResult& resultValue = hitResult.value();
+        float a = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
 
-        auto scatterResult = std::visit([&ray, &resultValue](auto&& material) { return material.Scatter(ray, resultValue); }, *resultValue.material);
+        glm::vec3 color = (1.0f - a) * glm::vec3(1.0, 1.0, 1.0) + a * glm::vec3(0.5, 0.7, 1.0);
 
-        if (scatterResult)
-        {
-            auto&& [color, scatteredRay] = scatterResult.value();
+        return color;
+    }
 
-            return color * GetRayColor(scatteredRay, sphereCollection, bounces + 1);
-        }
+    const HitResult& resultValue = hitResult.value();
 
+    auto scatterResult = std::visit([&ray, &resultValue](auto&& material) { return material.Scatter(ray, resultValue); }, *resultValue.material);
+
+    if (!scatterResult)
+    {
         return glm::vec3(0, 0, 0);
     }
 
-    float a = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
+    auto&& [color, scatteredRay] = scatterResult.value();
 
-    glm::vec3 color = (1.0f - a) * glm::vec3(1.0, 1.0, 1.0) + a * glm::vec3(0.5, 0.7, 1.0);
+    if (glm::dot(scatteredRay.direction, scatteredRay.direction) < 1e-6)
+    {
+        return glm::vec3(0, 0, 0);
+    }
 
-    return color;
+    return color * GetRayColor(scatteredRay, sphereCollection, bounces + 1);
 }
 
 Renderer::Renderer(size_t samplesPerPixel, size_t bounceLimit, std::chrono::duration<long long> logDelay) :

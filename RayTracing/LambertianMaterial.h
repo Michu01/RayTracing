@@ -13,6 +13,8 @@ private:
 	float reflectance;
 
 public:
+	LambertianMaterial();
+
 	LambertianMaterial(const glm::vec3& color, float reflectance);
 
 	std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;

@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "DefaultSettings.h"
 #include "SettingsProvider.h"
+#include "SpheresGenerator.h"
 
 class RenderView : public wxWindow
 {
@@ -28,14 +29,35 @@ private:
 
 	std::mutex imageMutex;
 
+	std::optional<wxPoint> lastPoint;
+	std::optional<wxPoint> rotationCenter;
+
+	bool isShiftPressed;
+
 private:
 	void OnPaint(wxPaintEvent& event);
 
 	void OnResize(wxSizeEvent& event);
 
+	void OnMotion(wxMouseEvent& event);
+
+	void OnEnterWindow(wxMouseEvent& event);
+
+	void OnLeaveWindow(wxMouseEvent& event);
+
+	void OnKeyDown(wxKeyEvent& event);
+
+	void OnKeyUp(wxKeyEvent& event);
+
+	void OnMiddleUp(wxMouseEvent& event);
+
+	void OnMiddleDown(wxMouseEvent& event);
+
+	void OnMouseWheel(wxMouseEvent& event);
+
 	void Render();
 
-	void RenderLoop(std::stop_token stopToken, Image imageCopy, Camera cameraCopy);
+	void RenderLoop(std::stop_token stopToken);
 
 	std::unique_ptr<std::jthread> CreateRenderThread();
 

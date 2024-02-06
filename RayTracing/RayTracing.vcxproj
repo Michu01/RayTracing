@@ -150,6 +150,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SleepFor.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="SpheresGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="SpheresGenerator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -66,6 +66,9 @@
     <ClInclude Include="DielectricMaterial.h">
       <Filter>Pliki nagłówkowe\Materials</Filter>
     </ClInclude>
+    <ClInclude Include="SpheresGenerator.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PPM_ImageSaver.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="MetalMaterial.cpp">
       <Filter>Pliki źródłowe\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="SpheresGenerator.cpp">
+      <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

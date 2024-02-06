@@ -15,6 +15,8 @@ private:
 	static float GetReflectance(float cos, float ref);
 
 public:
+	DielectricMaterial();
+
 	DielectricMaterial(float refraction);
 
 	std::optional<std::pair<glm::vec3, Ray>> Scatter(const Ray& inputRay, const HitResult& hitResult) const;	

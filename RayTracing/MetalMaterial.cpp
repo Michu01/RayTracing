@@ -1,6 +1,11 @@
 #include "MetalMaterial.h"
 #include "HitResult.h"
 
+MetalMaterial::MetalMaterial() :
+    color{}, fuzz{}
+{
+}
+
 MetalMaterial::MetalMaterial(const glm::vec3& color, float fuzz) :
     color{ color }, fuzz{ fuzz }
 {
