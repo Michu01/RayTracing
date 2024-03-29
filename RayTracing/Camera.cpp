@@ -45,6 +45,44 @@ Ray Camera::CreateRay(glm::uvec2 size, size_t row, size_t column) const
 	return ray;
 }
 
+std::function<Ray(size_t, size_t)> Camera::GetCreateRayFunction(glm::uvec2 size) const
+{
+	glm::vec3 w = glm::normalize(direction);
+	glm::vec3 u = glm::normalize(glm::cross(up, w));;
+	glm::vec3 v = glm::cross(w, u);
+
+	float focalLength = glm::length(direction);
+
+	float theta = glm::radians(vFov);
+	float viewportHeight = 2.0f * tan(0.5f * theta) * focalLength;
+	float viewportWidth = viewportHeight * aspectRatio;
+
+	glm::vec3 viewportU = viewportWidth * u;
+	glm::vec3 viewportV = viewportHeight * -v;
+
+	glm::vec3 pixelDeltaU = viewportU / (float)size.x;
+	glm::vec3 pixelDeltaV = viewportV / (float)size.y;
+
+	glm::vec3 viewportUpperLeft = position - focalLength * w - 0.5f * (viewportU + viewportV);
+
+	glm::vec3 pixelStart = viewportUpperLeft + 0.5f * (pixelDeltaU + pixelDeltaV);
+
+	std::uniform_real_distribution<float> distribution(-0.5f, 0.5f);
+
+	return [this, distribution, pixelStart, pixelDeltaV, pixelDeltaU](size_t row, size_t column)
+		{
+			float dx = Random::Instance.Float(distribution);
+			float dy = Random::Instance.Float(distribution);
+
+			glm::vec3 pixelCoord = pixelStart + ((float)row * pixelDeltaV) + ((float)column * pixelDeltaU);
+			glm::vec3 sampleCoord = pixelCoord + dx * pixelDeltaU + dy * pixelDeltaV;
+
+			Ray ray(position, sampleCoord - position);
+
+			return ray;
+		};
+}
+
 void Camera::SetUp(const glm::vec3& up)
 {
 	this->up = up;
@@ -74,16 +112,22 @@ void Camera::Move(const glm::vec3& offset)
 {
 	auto right = glm::normalize(glm::cross(up, direction));
 
-	position += glm::normalize(glm::cross(direction, up)) * offset.x + glm::normalize(glm::cross(direction, right)) * offset.y;
+	position += right * offset.x +
+		glm::vec3(0, 1, 0) * offset.y +
+		glm::normalize(glm::cross(right, up)) * offset.z;
 }
 
-void Camera::Rotate(const glm::vec3& origin, const glm::vec3& offset)
+void Camera::Rotate(const glm::vec3& offset)
 {
-	auto i = glm::identity<glm::mat4x4>();
-	auto rx = glm::rotate(i, offset.x * glm::pi<float>(), glm::vec3(0, 1, 0));
-	auto rxy = glm::rotate(rx, offset.y * glm::pi<float>(), glm::vec3(-1, 0, 0));
+	yaw += offset.x;
 
-	direction = glm::vec4(direction, 0) * rxy;
+	pitch = glm::clamp(pitch + offset.y, -89.0f, 89.0f);
+
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+	direction = glm::normalize(direction);
 }
 
 void Camera::Zoom(float factor)

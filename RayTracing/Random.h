@@ -11,7 +11,7 @@ private:
 	std::mt19937 generator{ std::random_device{}() };
 
 public:
-	static Random Instance;
+	static thread_local Random Instance;
 
 public:
 	float Float(std::uniform_real_distribution<float> distribution);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -9,12 +11,16 @@
 class Camera
 {
 private:
-	float vFov;
-	float aspectRatio;
-
 	glm::vec3 position;
 	glm::vec3 direction;
 	glm::vec3 up{ 0, 1, 0 };
+
+	float yaw = 90.0f;
+	float pitch = 0.0f;
+
+public:
+	float vFov;
+	float aspectRatio;
 
 public:
 	Camera();
@@ -35,7 +41,9 @@ public:
 
 	void Zoom(float factor);
 	
-	void Rotate(const glm::vec3& origin, const glm::vec3& offset);
+	void Rotate(const glm::vec3& offset);
 
 	Ray CreateRay(glm::uvec2 size, size_t row, size_t column) const;
+
+	std::function<Ray(size_t, size_t)> GetCreateRayFunction(glm::uvec2 size) const;
 };

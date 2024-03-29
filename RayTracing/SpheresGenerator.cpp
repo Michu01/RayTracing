@@ -20,14 +20,14 @@ SphereCollection SpheresGenerator::Generate(const Parameters& parameters)
 
             if (choice < parameters.lambertian)
             {
-                return LambertianMaterial(randGen.Color(), randGen.Float(std::uniform_real_distribution<float>(0.5, 1.0)));
+                return LambertianMaterial(randGen.Color(), 1.0);
             }
 
             choice -= parameters.lambertian;
 
             if (choice < parameters.dielectric)
             {
-                return DielectricMaterial(randGen.Float(std::uniform_real_distribution<float>(0.5, 1.5)));
+                return DielectricMaterial(1.5);
             }
 
             choice -= parameters.metal;
@@ -40,12 +40,12 @@ SphereCollection SpheresGenerator::Generate(const Parameters& parameters)
             return {};
         };
 
-    for (size_t n = 0; n != parameters.maxCount; ++n)
+    while (spheres.size() != parameters.maxCount)
     {
         Sphere sphere;
         sphere.radius = randGen.Float(std::uniform_real_distribution<float>(parameters.minRadius, parameters.maxRadius));
         sphere.center = parameters.center + parameters.radius * randGen.UnitVec3();
-        sphere.center.y = sphere.radius;
+        sphere.center.y = parameters.center.y + sphere.radius;
 
         if (isCollision(sphere))
         {
@@ -64,7 +64,7 @@ SphereCollection SpheresGenerator::Generate(const Parameters& parameters)
         spheres.push_back(sphere);
     }
 
-    Sphere sphere(glm::vec3(0, -10000, 0), 10000, LambertianMaterial(randGen.Color(), randGen.Float(std::uniform_real_distribution<float>(0.5, 1.0))));
+    Sphere sphere(parameters.center - glm::vec3(0, 10000, 0), 10000, LambertianMaterial(randGen.Color(), 1.0));
     spheres.push_back(sphere);
 
     return SphereCollection(spheres);

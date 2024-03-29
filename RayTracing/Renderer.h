@@ -16,23 +16,21 @@
 class Renderer
 {
 private:
+	std::chrono::seconds logDelay;
+
+public:
 	size_t samplesPerPixel;
 	size_t bounceLimit;
-	std::chrono::seconds logDelay;
 
 private:
 	void LogProgress(std::atomic_uint& i, glm::uvec2 imageSize, std::stop_token stopToken) const;
 
-	glm::vec3 GetRayColor(const Ray& ray, const SphereCollection& sphereCollection, size_t bounces = 0) const;
+	glm::vec3 GetRayColor(const Ray& ray, const SphereCollection& sphereCollection) const;
 
 public:
 	Renderer();
 
 	Renderer(size_t samplesPerPixel, size_t bounceLimit, std::chrono::duration<long long> logDelay);
-
-	void SetSamplesPerPixel(size_t samplesPerPixel);
-
-	size_t GetSamplesPerPixel() const;
 
 	Image Render(glm::uvec2 imageSize, const Camera& camera, const SphereCollection& sphereCollection) const;
 

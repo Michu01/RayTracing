@@ -1,6 +1,6 @@
 #include "Random.h"
 
-Random Random::Instance;
+thread_local Random Random::Instance;
 
 float Random::Float(std::uniform_real_distribution<float> distribution)
 {

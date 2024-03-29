@@ -1,7 +1,8 @@
 #include "Sphere.h"
 #include "Ray.h"
 
-Sphere::Sphere()
+Sphere::Sphere() :
+	center{}, radius{}
 {
 }
 
